@@ -1,0 +1,17 @@
+repo url enviada
+server recebe repo url 
+procura pelo arquivo: <user>.<repo_name>.cache.txt
+se existir
+  verifica se a última modificação no arquivo é mais velha que a última modificação do repo via git API
+    se o repositorio tiver sido modificado mais recente que o arquivo
+      clona novamente
+      roda o findead
+      atualiza o cache
+      retorna o resultado
+    se o arquivo de cache ainda se mantiver atual
+      apenas retorna o resultado do cache
+se não existir
+  clona
+  roda o findead
+  cria o cache
+  retorna o resultado

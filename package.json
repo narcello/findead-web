@@ -1,0 +1,19 @@
+{
+  "name": "findead-web",
+  "version": "1.0.0",
+  "description": "Web page for findead service.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "narcello",
+  "license": "ISC",
+  "scripts": {
+    "sync": "./scripts/sync.sh"
+  },
+  "devDependencies": {
+    "express": "^4.17.1"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "node-fetch": "^2.6.0"
+  }
+}
