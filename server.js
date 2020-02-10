@@ -17,7 +17,8 @@ app.get('/url', async function (req, res) {
     const needNewFindeadCheck = await needNewCheck(repoUrl, cacheFile);
     if (needNewFindeadCheck)
       await newCheck(repoUrl, repoName, cacheFile);
-    res.write('lastResultFile')
+    const results = await readCacheFile(cacheFile);
+    res.write(results);
   } catch (error) {
     res.write(error);
     res.end();
@@ -92,9 +93,12 @@ function newCheck(repoUrl, repoName, outputFile) {
   try {
     execSync(`~/findead-web/scripts/main.sh ${repoUrl} ${repoName} ${outputFile}`);
   } catch (err) {
-    console.log("ERRO AQUI")
     console.error(err);
   };
+}
+
+function readCacheFile(fileName) {
+  return fs.readFileSync(`../cache_results/${fileName}`);
 }
 
 app.listen(8080);
