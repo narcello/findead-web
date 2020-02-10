@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const fetch = require("node-fetch");
 const fs = require('fs');
+const { execSync } = require('child_process');
 
 app.use(express.static('public'))
 
@@ -11,11 +12,12 @@ app.get('/url', async function (req, res) {
     let { repoUrl } = req.query;
     repoUrl = repoUrl.indexOf('.git') > -1 ? repoUrl.replace('.git', '') : repoUrl;
     const [user, repoName] = getUserAndRepoNamesFromUrl(repoUrl);
+    const cacheFile = `${user}.${repoName}.txt`;
     await isReactRepositorie(repoUrl);
-    const needNewFindeadCheck = await needNewCheck(repoUrl, user, repoName);
-    if (needNewFindeadCheck) {
-      res.write('run findead')
-    } else res.write('lastResultFile')
+    const needNewFindeadCheck = await needNewCheck(repoUrl, cacheFile);
+    if (needNewFindeadCheck)
+      await newCheck(repoUrl, repoName, cacheFile);
+    res.write('lastResultFile')
   } catch (error) {
     res.write(error);
     res.end();
@@ -55,15 +57,15 @@ function isReactRepositorie(repoUrl) {
   })
 }
 
-async function needNewCheck(repoUrl, user, repoName) {
-  const cacheFileLastModification = getCacheFileLastModification(user, repoName);
+async function needNewCheck(repoUrl, cacheFile) {
+  const cacheFileLastModification = getCacheFileLastModification(cacheFile);
   const repoLastModification = await getRepoLastModification(repoUrl);
   return new Date(repoLastModification) > new Date(cacheFileLastModification);
 }
 
-function getCacheFileLastModification(user, repoName) {
+function getCacheFileLastModification(cacheFile) {
   try {
-    const stats = fs.statSync(`../cache_results/${user}.${repoName}.txt`)
+    const stats = fs.statSync(`../cache_results/${cacheFile}`)
     return stats.mtime;
   } catch (error) {
     return 0;
@@ -84,6 +86,15 @@ function getRepoLastModification(repoUrl) {
         reject(err.message)
       })
   })
+}
+
+function newCheck(repoUrl, repoName, outputFile) {
+  try {
+    execSync(`~/findead-web/scripts/main.sh ${repoUrl} ${repoName} ${outputFile}`);
+  } catch (err) {
+    console.log("ERRO AQUI")
+    console.error(err);
+  };
 }
 
 app.listen(8080);
