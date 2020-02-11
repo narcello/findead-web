@@ -12,3 +12,21 @@ form {
   align-items: center;
   justify-content: space-evenly;
 }
+
+#repo-url {
+  width: 500;
+}
+
+img {
+  width: 200px;
+  height: 200px;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}

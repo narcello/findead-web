@@ -2,12 +2,9 @@
   "name": "findead-web",
   "version": "1.0.0",
   "description": "Web page for findead service.",
-  "main": "index.js",
-  "keywords": [],
   "author": "narcello",
   "license": "ISC",
   "scripts": {
-    "sync": "./scripts/sync.sh",
     "start": "pm2 start server.js --watch"
   },
   "devDependencies": {
