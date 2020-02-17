@@ -13,8 +13,10 @@ app.get('/url', async function (req, res) {
     repoUrl = repoUrl.indexOf('.git') > -1 ? repoUrl.replace('.git', '') : repoUrl;
     const [user, repoName] = getUserAndRepoNamesFromUrl(repoUrl);
     const cacheFile = `${user}.${repoName}.txt`;
-    await isReactRepositorie(repoUrl);
-    const needNewFindeadCheck = await needNewCheck(repoUrl, cacheFile);
+    const cacheFileLastModification = await getCacheFileLastModification(cacheFile);
+    if (cacheFileLastModification === 0)
+      await isReactRepositorie(repoUrl);
+    const needNewFindeadCheck = await needNewCheck(repoUrl, cacheFileLastModification);
     if (needNewFindeadCheck)
       await newCheck(repoUrl, repoName, cacheFile);
     const results = await readCacheFile(cacheFile);
@@ -58,8 +60,7 @@ function isReactRepositorie(repoUrl) {
   })
 }
 
-async function needNewCheck(repoUrl, cacheFile) {
-  const cacheFileLastModification = getCacheFileLastModification(cacheFile);
+async function needNewCheck(repoUrl, cacheFileLastModification) {
   const repoLastModification = await getRepoLastModification(repoUrl);
   return new Date(repoLastModification) > new Date(cacheFileLastModification);
 }
