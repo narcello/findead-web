@@ -4,10 +4,9 @@ const fetch = require("node-fetch");
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-app.use(express.static('public'))
+app.use(express.static('public'));
 
 app.get('/url', async function (req, res) {
-  res.writeHead(200, { 'Content-type': 'text/plain' });
   try {
     let { repoUrl } = req.query;
     repoUrl = repoUrl.indexOf('.git') > -1 ? repoUrl.replace('.git', '') : repoUrl;
@@ -20,9 +19,15 @@ app.get('/url', async function (req, res) {
     if (needNewFindeadCheck)
       await newCheck(repoUrl, repoName, cacheFile);
     const results = await readCacheFile(cacheFile);
-    res.write(results);
+    res.status(200).send(
+      '<div id="results">' +
+      results.toString('utf-8').split('\n').map(content =>
+        '<div>'
+        + content +
+        '</div>') +
+      '</div>')
   } catch (error) {
-    res.write(error);
+    res.send('<div>' + error + '</div>')
     res.end();
   }
   res.end();
@@ -47,6 +52,7 @@ function isReactRepositorie(repoUrl) {
         Array.isArray(isReactRepo) ? resolve(`${repoUrl} is a react repositorie`) : reject(`${repoUrl} is not a react repositorie`)
       })
       .catch(err => {
+        console.log({ err })
         const { type, message } = err;
         switch (type) {
           case 'invalid-json':
