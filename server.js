@@ -3,6 +3,32 @@ const app = express();
 const fetch = require("node-fetch");
 const fs = require('fs');
 const { execSync } = require('child_process');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+var schema = buildSchema(`
+  query {
+    repository(owner: "narcello" name:"findead"){
+      folder: object(expression: "master:package.json"){
+        ... on Blob{
+          text
+        }
+      }
+    }
+  }
+`);
+
+var root = {
+  hello: () => {
+    return 'Hello world!';
+  },
+};
+
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
 
 app.use(express.static('public'))
 
